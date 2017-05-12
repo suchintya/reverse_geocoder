@@ -1,7 +1,9 @@
 import csv
 import argparse
 import datetime
-from geopy.geocoders import Nominatim
+import pytz
+from timezonefinderL import TimezoneFinder
+from pytz import timezone 
 
 DEFAULT_TERM = 1480042675
 DEFAULT_LONGITUDE = -37.76
@@ -22,7 +24,7 @@ def main():
     input_values = parser.parse_args()
 
     try:
-        query_by_cood(input_values.lat, input_values.lon, input_values.utc)
+        query_local(input_values.lat, input_values.lon, input_values.utc)
     except HTTPError as error:
         sys.exit(
             'Encountered HTTP error {0} on {1}:\n {2}\nAbort program.'.format(
@@ -32,32 +34,16 @@ def main():
             )
         )
 
-def query_by_cood(latitude, longitude, utc):
-    geolocator = Nominatim()
-    location = geolocator.reverse("{}, {}".format(latitude, longitude))
-    print(location.address)
-    myzip = location.raw['address']['postcode']
+def query_local(latitude, longitude, utcTime):
+    tf = TimezoneFinder()
+    timezone_name = tf.timezone_at(lng=longitude, lat=latitude)
 
-    zipcodes = {}
-    with open('zipcode.csv', newline='') as csvfile:
-        zipreader = csv.reader(csvfile)
-        flag = False
-        for row in zipreader:
-            ''' skip the header row '''
-            if flag is False:
-                flag = True
-                continue
-            offset = int(row[5])
-            zipcodes[row[0]] = offset
+    tz = timezone(timezone_name)
+    value = datetime.datetime.fromtimestamp(utcTime)
+    aware_datetime = pytz.utc.localize(value)
+    aware_datetime_in_local = aware_datetime.astimezone(tz)
 
-    offset = zipcodes[myzip]
-    print("offset: ", offset)
-
-    value = datetime.datetime.fromtimestamp(utc)
-    print("UTC: ", value)
-
-    hour_diff = datetime.timedelta(hours=offset)
-    print("local time: ", value + hour_diff)
+    print(aware_datetime_in_local)
 
 if __name__ == '__main__':
     main()
