@@ -8,6 +8,7 @@ from pytz import timezone
 DEFAULT_TERM = 1480042675
 DEFAULT_LONGITUDE = 122.41
 DEFAULT_LATITUDE = -37.76
+tf = TimezoneFinder()
 
 def main():
     print(TimezoneFinder.using_numba())
@@ -34,7 +35,7 @@ def main():
                 error.read(),
             )
         )
-    with open('smove.csv') as csvfile:
+    with open('11_16_US_Thanksgiving.csv') as csvfile:
         zipreader = csv.reader(csvfile)
         flag = False
         count = 0
@@ -54,9 +55,10 @@ def main():
                 write_row.append(str(aware_time))
                 spamwriter = csv.writer(csvout)
                 spamwriter.writerow(write_row)
+                print(aware_time)
 
 def query_local(latitude, longitude, utcTime):
-    tf = TimezoneFinder()    
+    
     aware_datetime_in_local = datetime.datetime.now
     try:
         timezone_name = tf.timezone_at(lng=longitude, lat=latitude)
