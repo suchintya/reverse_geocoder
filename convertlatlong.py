@@ -55,18 +55,20 @@ def main():
                 write_row.append(str(aware_time))
                 spamwriter = csv.writer(csvout)
                 spamwriter.writerow(write_row)
-                print(aware_time)
 
 def query_local(latitude, longitude, utcTime):
     
     aware_datetime_in_local = datetime.datetime.now
     try:
         timezone_name = tf.timezone_at(lng=longitude, lat=latitude)
-
-        tz = timezone(timezone_name)
-        value = datetime.datetime.fromtimestamp(utcTime)
-        aware_datetime = pytz.utc.localize(value)
-        aware_datetime_in_local = aware_datetime.astimezone(tz)
+        if(timezone_name is None or timezone_name is 'uninhabited'):
+            print(timezone_name)
+            timezone_name = tf.closest_timezone_at(lng=longitude, lat=latitude)
+        if(timezone_name is not 'uninhabited'):
+            tz = timezone(timezone_name)
+            value = datetime.datetime.fromtimestamp(utcTime)
+            aware_datetime = pytz.utc.localize(value)
+            aware_datetime_in_local = aware_datetime.astimezone(tz)
     except RuntimeWarning:
         pass
     return aware_datetime_in_local
