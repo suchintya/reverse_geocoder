@@ -3,7 +3,7 @@ import datetime
 
 def main():
 	print("hello world")
-	lastId = 2
+	lastId = 1
 	modaloc = {879398948:list()}
 	with open('output.csv') as csvfile:
 		batchreader = csv.reader(csvfile)
@@ -26,13 +26,14 @@ def main():
 				if(len(geoList) > 0):
 					geoMode = max(geoList, key = geoList.count)
 					print("geomode: ",geoMode)
+					if(len(geoMode) > 0):
+						with open('modeout.csv','w',newline='') as csvout:
+							spamwriter = csv.writer(csvout)
+							spamwriter.writerow({lastId,geoMode})
 				lastId = tempId
 				modaloc.clear()
 				geoList.clear()
-				'''with open('modeout.csv','w',newline='') as csvout:
-					spamwriter = csv.writer(csvout)
-					spamwriter.writerow(lastrow)
-				'''
+
 
 if __name__ == '__main__':
     main()
