@@ -38,12 +38,8 @@ def main():
     with open('11_16_US_Thanksgiving.csv') as csvfile:
         zipreader = csv.reader(csvfile)
         flag = False
-        count = 0
         with open('output.csv','w',newline='') as csvout:
             for row in zipreader:
-                count = count + 1
-                if count == 10:
-                    exit
                 if flag is False:
                     flag = True
                     continue
@@ -64,7 +60,9 @@ def query_local(latitude, longitude, utcTime):
         if(timezone_name is None or timezone_name is 'uninhabited'):
             print(timezone_name)
             timezone_name = tf.closest_timezone_at(lng=longitude, lat=latitude)
-        if(timezone_name is not 'uninhabited'):
+        if(timezone_name is 'uninhabited' or timezone_name is None):
+            print("hit None")
+        else:
             tz = timezone(timezone_name)
             value = datetime.datetime.fromtimestamp(utcTime)
             aware_datetime = pytz.utc.localize(value)
